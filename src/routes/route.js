@@ -6,14 +6,14 @@ const commonMW = require ("../middleware/commonMW")
 const authorController= require("../controllers/authorController")
 const blogsController = require("../controllers/blogsController")
 
-router.post("/authors", authorController.createAuthor)//create author
-router.post("/blogs",commonMW.validation, commonMW.authenticate, blogsController.createBlogs)//create blogs
-router.get("/blogs",commonMW.authenticate,  blogsController.findBlogs)//get blogs details
-router.put("/blogs/:blogsId/tags",commonMW.authenticate,commonMW.authorised,blogsController.updateBlogs) //update blogs by path param
-router.delete("/delblogs/:blogId",commonMW.authenticate, commonMW.authorised, blogsController.delBlogs)//delete by path params
-router.delete("/blogs", commonMW.authenticate,  blogsController.delBlogsByQuery)//delete by query params
+router.post("/authors", authorController.createAuthor)//create author //Done
+router.get("/login", authorController.loginAuthor)//login author //Done
+router.post("/blogs",commonMW.authenticate,blogsController.createBlogs)//create blogs //Done
+router.get("/blogs",commonMW.authenticate,blogsController.getBlogs)//get blogs details //Done
+router.put("/blogs/:blogsId",commonMW.authenticate,blogsController.updateBlogs) //update blogs by path param tags category authorid
+router.delete("/blogs/:blogsId",commonMW.authenticate,blogsController.delBlogs)//delete by path params
 
-router.post("/login", authorController.loginAuthor)
+router.delete("/blogs",commonMW.authenticate,blogsController.delBlogsByQuery)//delete by query params
 
 
 

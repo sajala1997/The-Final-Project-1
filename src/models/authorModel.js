@@ -16,13 +16,13 @@ const authorSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        validate: [isEmail, 'invalid Email'],
+    
 
     },
     title: {
         type: String,
         required: true,
-        enum: ["Mr.", "Mrs.", "Miss"]
+        enum: ["Mr", "Mrs", "Miss"] //arr.indexOf
     },
     password: {
         type: String,
