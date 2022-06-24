@@ -21,6 +21,7 @@ const findBlogs = async function (req, res) {
     try {
         let allQuery = req.query
         let blogsDetail = await blogsModel.find(allQuery)
+
         console.log(blogsDetail)
         if (blogsDetail == false)
             res.status("404").send({ status: false, msg: "data not found" })
@@ -38,7 +39,7 @@ const updateBlogs = async function (req, res) {
         let update = req.body
         update.isPublishedAt = moment(new Date()).format('DD/MM/YYYY');
         console.log(update)
-        let updatedBlog = await blogsModel.findOneAndUpdate({ $and: [{ isDeleted: false }, { _id: req.params.blogsId }] }, { $set: update }, { new: true, upsert: true })
+        let updatedBlog = await blogsModel.findOneAndUpdate({ $and: [{ isDeleted: false }, { _id: req.params.blogsId }] }, { $set: update }, { new: true})
         let blog = req.params.blogsId
         if (!blog) return res.status(404).send({ status: false, data: "ID not Found" })
         else res.status(200).send({ status: true, data: updatedBlog })
@@ -57,6 +58,7 @@ const delBlogs = async function (req, res) {
         console.log(blogId,"blogId is")
         if (blogId){
             const data = await blogsModel.findById(blogId)
+            console.log(data)
             if (!data)
             return res.status(404).send({ status: false, msg: "blog Not Found with this Id" })
 
@@ -74,10 +76,24 @@ const delBlogs = async function (req, res) {
 }
 
 //DELETE-----by query params           
+
 const delBlogsByQuery = async function (req, res) {
     try {
         let query = req.query
+        console.log(query)
+        let data=Object.keys(query)//when allQuery is empty
+        if (!data.length) return res.status(404).send({msg:"data required in query params"})
+        query.isDeleted=false
+        console.log(query)
+      
+       
+        let authorLoggedin= req.authorId
+        console.log(authorLoggedin)
+        query.authorId=authorLoggedin
         const filterByQuery = await blogsModel.find(query)
+        console.log(filterByQuery)
+        console.log(filterByQuery.length)
+        
 
         if (filterByQuery.length == 0) {   //
             return res.status(404).send({ status: false, msg: "No blog found to delete" })
@@ -92,6 +108,18 @@ const delBlogsByQuery = async function (req, res) {
         res.status(500).send({ status: false, msg: err.message })
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 module.exports.createBlogs = createBlogs
