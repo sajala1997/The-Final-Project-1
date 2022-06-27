@@ -4,7 +4,7 @@ const moment = require('moment')
 const blogsSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        required: true
         // match:/^[a-zA-Z:0-9@]+$/,
         // error:{
         //     type : 'Title must be a string', 
@@ -16,14 +16,14 @@ const blogsSchema = new mongoose.Schema({
     },
     body: {
         type: String,
-        required: true,
-        match:/^[a-zA-Z0-9!@#$&()`.+,/"-<>\s]+$/, //blogcontroller
-        error:{
-            type : 'Title must be a string',
-            required: 'Title is required',
-            match:'Title cannot contain any white space',
+        required: true
+        // match:/^[a-zA-Z0-9!@#$&()`.+,/"-<>\s]+$/, //blogcontroller
+        // error:{
+        //     type : 'Title must be a string',
+        //     required: 'Title is required',
+        //     match:'Title cannot contain any white space',
             
-        }
+        
     },
     authorId: {
         type: mongoose.Schema.Types.ObjectId,
