@@ -13,12 +13,12 @@ const createAuthor = async function (req, res) {
 
         //validate fname
         if (!/^[a-zA-Z.]+$/.test(data.fname)) {
-            return res.status(400).send({ status: false, message: `name contain only alphabets` })
+            return res.status(400).send({ status: false, message: `First name contain only alphabets` })
         }
 
         //validate lname
         if (!/^[a-zA-Z.]+$/.test(data.lname)) {
-            return res.status(400).send({ status: false, message: `name contain only alphabets` })
+            return res.status(400).send({ status: false, message: `last name contain only alphabets` })
         }
 
         //validate(email)
@@ -34,15 +34,15 @@ const createAuthor = async function (req, res) {
         if (isvalid(title)){
             return res.status(400).send({status: false, msg:"title shoud be one of Mr, Mrs, Miss"})
         }
-
+        //password validation
+        if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/.test(data.password)) {
+            return res.status(400).send({ status: false, message: `password shoud be 6 to 20 characters which contain at least one numeric digit, one uppercase and one lowercase letter` })
+          } 
         let savedData = await authorModel.create(data)
-        res.send({ msg: savedData })
+        return res.send({ msg: savedData })
 
-    //     //password
-    //     if (!/^[a-zA-Z.]+$/.test(data.password)) {
-    //         return res.status(400).send({ status: false, message: `password contain only alphabets` })
-    //     }
-    // }
+    
+    
     }
     catch (err) {
         console.log(err.message)
@@ -52,7 +52,7 @@ const createAuthor = async function (req, res) {
 
 //login and token creation
 const loginAuthor = async function (req, res) {
-    let AuthorName = req.body.emailId;
+   try {let AuthorName = req.body.emailId;
     let password = req.body.password;
     //email is required
     if(!AuthorName) return res.status(400).send({status:false,msg:"author Email is required"})
@@ -73,31 +73,19 @@ const loginAuthor = async function (req, res) {
         "ProjectBlog"
     );
     //res.setHeader("x-api-key", token);
-    res.send({ status: true, token: token });
+    return res.status(201).send({ status: true, token: token });
+}
+catch (err) {
+    console.log(err.message)
+    res.status(500).send({ msg: err.message })
+}
+    
 };
 
 
-//get author data
-const getAuthorData = async function (req, res) {
-    let authorId = req.params.authorId;
-    let authorDetails = await authorModel.findById(authorId);
-    res.send({ status: true, data: authorDetails });
-};
 
 
-//update author details     
-const updateAuthor = async function (req, res) {
-    let authorData = req.body;
-    let updatedAuthor = await authorModel.findOneAndUpdate({ _id: authorId }, authorData);
-    res.send({ status: true, data: updatedAuthor });
 
-};
-
-//deleted author     
-const deleteAuthor = async function (req, res) {
-    let delAuthor = await authorModel.findByIdAndUpdate({ _id: authorId }, { $set: { isDelete: true } })
-    res.send({ data: delAuthor })
-};
 
 /*const patterns={
     fname :/^[a-z\d]{5,12}$/i,
@@ -116,6 +104,3 @@ function validate(field,regex){
 */
 module.exports.createAuthor = createAuthor
 module.exports.loginAuthor = loginAuthor
-module.exports.getAuthorData = getAuthorData
-module.exports.updateAuthor = updateAuthor
-module.exports.deleteAuthor = deleteAuthor

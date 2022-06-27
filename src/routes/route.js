@@ -11,7 +11,7 @@ router.get("/login", authorController.loginAuthor)//login author //Done
 router.post("/blogs",commonMW.authenticate,blogsController.createBlogs)//create blogs //Done
 router.get("/blogs",commonMW.authenticate,blogsController.getBlogs)//get blogs details //Done
 router.put("/blogs/:blogsId",commonMW.authenticate,blogsController.updateBlogs) //update blogs by path param tags category authorid
-router.delete("/blogs/:blogsId",commonMW.authenticate,blogsController.delBlogs)//delete by path params
+router.delete("/blogs/:blogsId",commonMW.authenticate,blogsController.delBlogs)//delete by path params //Done
 
 router.delete("/blogs",commonMW.authenticate,blogsController.delBlogsByQuery)//delete by query params
 
