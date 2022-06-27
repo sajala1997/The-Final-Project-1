@@ -13,6 +13,8 @@ const createBlogs = async function (req, res) {
         let data = req.body
         let author = req.body.authorId
         if (!author) return res.status(400).send({ status: false, msg: "authorId is mandatory" })
+        let check = await blogsModel.findOne({_id: author})
+        if(!check) return res.status(400).send({status: false, msg: "authorId is not correct"})
         let token = req.headers["x-api-key"];
         if (!token) token = req.headers["X-Api-Key"];
         let decodedToken = jwt.verify(token, "ProjectBlog");
@@ -72,7 +74,7 @@ const updateBlogs = async function (req, res) {
 
 }
 ////////////////////////
-const Updateblog = async function (req, res) {
+// const Updateblog = async function (req, res) {
 
     //     let token = req.headers ["x-api-key"];
     //     console.log(token)
@@ -82,19 +84,19 @@ const Updateblog = async function (req, res) {
     //     if(!decodedToken) return res.status(403).send({status:false,msg:"Not Authorised"});
     //     let author = req.params.authorId
     //     console.log(author)
-    let update = req.body
-    let blogId = await blogsModel.findById(req.params.authorId)
-    console.log(blogId)
-    let updatedBlog = await blogsModel.findOneAndUpdate(
-        { _id: req.params.authorId },
-        { $set: update },
-        {
-            new: true,
-            upsert: true
-        })
-    console.log(update)
-    res.status(200).send({ status: true, data: updatedBlog })
-}
+//     let update = req.body
+//     let blogId = await blogsModel.findById(req.params.authorId)
+//     console.log(blogId)
+//     let updatedBlog = await blogsModel.findOneAndUpdate(
+//         { _id: req.params.authorId },
+//         { $set: update },
+//         {
+//             new: true,
+//             upsert: true
+//         })
+//     console.log(update)
+//     res.status(200).send({ status: true, data: updatedBlog })
+// }
 
 //DELETE----by path param
 const delBlogs = async function (req, res) {
@@ -144,22 +146,96 @@ const delBlogs = async function (req, res) {
 // }
 
 
-//DELETE-----by query params           
+//DELETE-----by query params    
+
+
+
+
+
+
+
 
 const delBlogsByQuery = async function (req, res) {
+
     try {
-
         let query = req.query
-    let data=Object.keys(query)//when allQuery is empty
-    if (!data.length) return res.status(404).send({msg:"some data required in query param"})
-///////
-        
-        
-        let filterByQuery = await blogsModel.find(query)
-        if(!filterByQuery) return res.status(400).send({status:false, msg:"data not found"})
-        console.log(filterByQuery.authorId)
+        //console.log(query)
+        let data = Object.keys(query)
+        if (!data.length) return res.status(411).send({ status: false, msg: "Data can not be empty" });
+        let blog = await blogsModel.find(query).select({ authorId: 1, _id: 1 })//
+        console.log(blog)
+        let token = req.headers["x-api-key"]
+        if (!token) return res.status(401).send({ status: false, msg: "Author is not authenticated" })
+        let decodedToken = jwt.verify(token, "ProjectBlog")
+        console.log(decodedToken)
+        if (!decodedToken) return res.status(403).send({ status: false, msg: "User is not authorised" })
+        let authorisedId = decodedToken.authorId
+        console.log(authorisedId)
+        let auth = blog.find(e => e.authorId == authorisedId)//here we are finding out author id which is related to query params and whose value is equal to our decodedToken. if we will find the value we will get authorid else undefined
+        console.log(auth)
+        if (auth === undefined) return res.status(404).send({ msg: "no such blog found to delete in your collection" })
+        // console.log(req.token)//it will give us author id which is in decoded token and it will give us those author id only which is authorised to update or delete    
+        let deletBlog = await blogsModel.findByIdAndUpdate(
+            { _id: auth._id },
+            { $set: { isDeleted: true, isDeletedAt: new Date() } },
+            { new: true })
+        console.log(deletBlog)
+        return res.status(200).send({ status: true, msg: deletBlog })
+    }
+    catch (err) {
+        return res.status(500).send({ msg: err.message })
+    }
+}
 
-        //query.isDeleted = false
+
+//     try {
+//         let query = req.query
+//         console.log(query)
+//         let data=Object.keys(query)//when allQuery is empty
+//         console.log(data)
+//         if (!data.length) return res.status(404).send({msg:"data required in query params"})
+//         query.isDeleted=false
+//         console.log(query)
+      
+       
+//         let authorLoggedin= req.authorId
+//         console.log(authorLoggedin)
+//         query.authorId=authorLoggedin
+//         const filterByQuery = await blogsModel.find(query)
+//         console.log(filterByQuery)
+//         console.log(filterByQuery.length)
+        
+
+//         if (filterByQuery.length == 0) {   //
+//             return res.status(404).send({ status: false, msg: "No blog found to delete" })
+//         }
+//         const deletedDetails = await blogsModel.updateMany(query, { isDeleted: true, deletedAt: moment(new Date()).format('DD/MM/YYYY') },//new Date.().toLocaleString()
+//             { new: true })
+//         res.status(201).send({ status: true, data: deletedDetails })
+
+//     }
+//     catch (err) {
+//         console.log(err.message)
+//         res.status(500).send({ status: false, msg: err.message })
+//     }
+// }
+
+
+
+// const delBlogsByQuery = async function (req, res) {
+//     try {
+
+//         let query = req.query
+//     let data=Object.keys(query)//when allQuery is empty
+//     if (!data.length) return res.status(404).send({msg:"some data required in query param"})
+// ///////
+        
+        
+//         let filterByQuery = await blogsModel.find(query)
+//         if(!filterByQuery) return res.status(400).send({status:false, msg:"data not found"})
+//         console.log(filterByQuery.authorId)
+
+//         //query.isDeleted = false
 
         // let authorLoggedin= req.authorId
         //console.log(req.query.authorId)
@@ -181,13 +257,13 @@ const delBlogsByQuery = async function (req, res) {
         // const deletedDetails = await blogsModel.updateMany(query, { isDeleted: true, deletedAt: moment(new Date()).format('DD/MM/YYYY') },//new Date.().toLocaleString()
         //     { new: true })
         // res.status(201).send({ status: true, data: deletedDetails })
-res.send({msg:"done"})
-    }
-    catch (err) {
-        console.log(err.message)
-        res.status(500).send({ status: false, msg: err.message })
-    }
-}
+// res.send({msg:"done"})
+//     }
+//     catch (err) {
+//         console.log(err.message)
+//         res.status(500).send({ status: false, msg: err.message })
+//     }
+// }
 
 
 

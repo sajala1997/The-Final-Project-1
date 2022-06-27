@@ -10,6 +10,7 @@ const createAuthor = async function (req, res) {
         
         if (await authorModel.findOne({ emailId: data.emailId }))
             return res.status(400).send({ msg: "Email Id already exist" })
+            
 
         //validate fname
         if (!/^[a-zA-Z.]+$/.test(data.fname)) {
@@ -35,18 +36,19 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({status: false, msg:"title shoud be one of Mr, Mrs, Miss"})
         }
 
-        let savedData = await authorModel.create(data)
-        res.send({ msg: savedData })
+        //password validation
+        // if (!/^(?=.\d)(?=.[a-z])(?=.*[A-Z]).{6,20}$/.test(data.password)) {
+        //     return res.status(400).send({ status: false, message: `password shoud be 6 to 20 characters which contain at least one numeric digit, one uppercase and one lowercase letter` })
+        //   } 
 
-    //     //password
-    //     if (!/^[a-zA-Z.]+$/.test(data.password)) {
-    //         return res.status(400).send({ status: false, message: `password contain only alphabets` })
-    //     }
-    // }
-    }
+        let savedData = await authorModel.create(data)
+        res.status(201).send({ msg: savedData })
+
+    
+        }
     catch (err) {
-        console.log(err.message)
-        res.status(500).send({ msg: err.message })
+    console.log(err.message)
+    res.status(500).send({ msg: err.message })
     }
 }
 
@@ -78,26 +80,26 @@ const loginAuthor = async function (req, res) {
 
 
 //get author data
-const getAuthorData = async function (req, res) {
-    let authorId = req.params.authorId;
-    let authorDetails = await authorModel.findById(authorId);
-    res.send({ status: true, data: authorDetails });
-};
+// const getAuthorData = async function (req, res) {
+//     let authorId = req.params.authorId;
+//     let authorDetails = await authorModel.findById(authorId);
+//     res.send({ status: true, data: authorDetails });
+// };
 
 
 //update author details     
-const updateAuthor = async function (req, res) {
-    let authorData = req.body;
-    let updatedAuthor = await authorModel.findOneAndUpdate({ _id: authorId }, authorData);
-    res.send({ status: true, data: updatedAuthor });
+// const updateAuthor = async function (req, res) {
+//     let authorData = req.body;
+//     let updatedAuthor = await authorModel.findOneAndUpdate({ _id: authorId }, authorData);
+//     res.send({ status: true, data: updatedAuthor });
 
-};
+// };
 
 //deleted author     
-const deleteAuthor = async function (req, res) {
-    let delAuthor = await authorModel.findByIdAndUpdate({ _id: authorId }, { $set: { isDelete: true } })
-    res.send({ data: delAuthor })
-};
+// const deleteAuthor = async function (req, res) {
+//     let delAuthor = await authorModel.findByIdAndUpdate({ _id: authorId }, { $set: { isDelete: true } })
+//     res.send({ data: delAuthor })
+// };
 
 /*const patterns={
     fname :/^[a-z\d]{5,12}$/i,
@@ -116,6 +118,6 @@ function validate(field,regex){
 */
 module.exports.createAuthor = createAuthor
 module.exports.loginAuthor = loginAuthor
-module.exports.getAuthorData = getAuthorData
-module.exports.updateAuthor = updateAuthor
-module.exports.deleteAuthor = deleteAuthor
+// module.exports.getAuthorData = getAuthorData
+// module.exports.updateAuthor = updateAuthor
+// module.exports.deleteAuthor = deleteAuthor
