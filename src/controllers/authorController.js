@@ -39,8 +39,11 @@ const createAuthor = async function (req, res) {
         if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/.test(data.password)) {
             return res.status(400).send({ status: false, message: `password shoud be 6 to 20 characters which contain at least one numeric digit, one uppercase and one lowercase letter` })
           } 
+          
         let savedData = await authorModel.create(data)
-        return res.send({ msg: savedData })
+       
+        return res.status(201).send({ msg: savedData })
+
 
     
     

@@ -14,26 +14,41 @@ const jwt = require("jsonwebtoken")
 
 //POST-----create blogs
 const createBlogs = async function (req, res) {
+
+
     try {
         let data = req.body
         let author = req.body.authorId
         let body = req.body.body
         if (!author) return res.status(400).send({ status: false, msg: "authorId is mandatory" })
-        let check = await blogsModel.findOne({_id: author})
-        if(!check) return res.status(400).send({status: false, msg: "authorId is not correct"})
         let token = req.headers["x-api-key"];
         if (!token) token = req.headers["X-Api-Key"];
         let decodedToken = jwt.verify(token, "ProjectBlog");
+        console.log(decodedToken.authorId)
+        console.log(author)
         if (decodedToken.authorId !== author) return res.status(400).send({ status: false, msg: "Author not Authorized to create blog" })
 
 
+    // try {
+    //     let data = req.body
+    //     let author = req.body.authorId
+    //     let body = req.body.body
+    //     if (!author) return res.status(400).send({ status: false, msg: "authorId is mandatory" })
+    //     let check = await blogsModel.findOne({_id: author})
+    //     if(!check) return res.status(400).send({status: false, msg: "authorId is not correct"})
+    //     let token = req.headers["x-api-key"];
+    //     if (!token) token = req.headers["X-Api-Key"];
+    //     let decodedToken = jwt.verify(token, "ProjectBlog");
+    //     if (decodedToken.authorId !== author) return res.status(400).send({ status: false, msg: "Author not Authorized to create blog" })
+
+
 //validate title
-if (!/^[a-zA-Z0-9:-]+$/.test(data.title)) {
+if (!/^[a-zA-Z0-9:-_ . ]+$/.test(data.title)) {
     return res.status(400).send({ status: false, message: `title should not be empty it contains only alphabets and numeric values and two special characters - and :` })
 }
 
 //validate body
-if (!/^[a-zA-Z0-9:-]+$/.test(body)) {
+if (!/^[a-zA-Z0-9:-_ . ]+$/.test(body)) {
     return res.status(400).send({ status: false, message: `body should not be empty it contains only alphabets and numeric values and two special characters like - and :` })
 }
 
@@ -70,6 +85,7 @@ const updateBlogs = async function (req, res) {
     try {
         let update = req.body
         let blog = req.params.blogsId
+        console.log(blog)
         if (!blog) return res.status(404).send({ status: false, data: "ID not Found in path param" })
 
         const check = await blogsModel.findById(blog)
@@ -123,6 +139,7 @@ const delBlogs = async function (req, res) {
         if (!blog) return res.status(404).send({ status: false, data: "ID not Found in path param" })
 
         const check = await blogsModel.findById(blog)
+        if(check.isDeleted=="true") return res.status(200).send({ status: false, msg: "data is already deleted" }) 
         if (!check) return res.status(404).send({ status: false, msg: "data not found with this blog id" })
         console.log(check)
         let token = req.headers["x-api-key"];
@@ -179,14 +196,16 @@ const delBlogsByQuery = async function (req, res) {
         //console.log(query)
         let data = Object.keys(query)
         if (!data.length) return res.status(411).send({ status: false, msg: "Data can not be empty" });
-        let blog = await blogsModel.find(query).select({ authorId: 1, _id: 1 })//
-        console.log(blog)
+        let blog = await blogsModel.find(query)
+       
+        // if(blog.isDeleted==true)
+        // return res.status(401).send({ status: false, msg: "already deleted" })
         let token = req.headers["x-api-key"]
         if (!token) return res.status(401).send({ status: false, msg: "Author is not authenticated" })
-        let decodedToken = jwt.verify(token, "Project-1")
+        let decodedToken = jwt.verify(token, "ProjectBlog")
         console.log(decodedToken)
         if (!decodedToken) return res.status(403).send({ status: false, msg: "User is not authorised" })
-        let authorisedId = decodedToken.userid
+        let authorisedId = decodedToken.authorId
         console.log(authorisedId)
         let auth = blog.find(e => e.authorId == authorisedId)//here we are finding out author id which is related to query params and whose value is equal to our decodedToken. if we will find the value we will get authorid else undefined
         console.log(auth)
@@ -197,7 +216,8 @@ const delBlogsByQuery = async function (req, res) {
             { $set: { isDeleted: true, isDeletedAt: new Date() } },
             { new: true })
         console.log(deletBlog)
-        return res.status(200).send({ status: true, msg: deletBlog })
+         return res.status(200).send({ status: true, msg: deletBlog })
+
     }
     catch (err) {
         return res.status(500).send({ msg: err.message })
