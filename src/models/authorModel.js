@@ -22,7 +22,7 @@ const authorSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        enum: ["Mr", "Mrs", "Miss"] //arr.indexOf
+        enum: ["Mr", "Mrs", "Miss"] 
     },
     password: {
         type: String,
