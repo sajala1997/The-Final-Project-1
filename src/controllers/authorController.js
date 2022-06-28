@@ -89,22 +89,5 @@ catch (err) {
 
 
 
-
-
-/*const patterns={
-    fname :/^[a-z\d]{5,12}$/i,
-    lname :/^[a-z\d]{5,12}$/i,
-    emailId :/^([a-z\d]\.-]+)@([a-z\d-]+)\.([a-z])$/,
-    password :/^[\w@-]{8,20}$/,
-};
-
-function validate(field,regex){
-    if(regex.test(field.value)){
-        field.className='valid';
-    }else{
-        field.className='invalid';
-    }
-}
-*/
 module.exports.createAuthor = createAuthor
 module.exports.loginAuthor = loginAuthor

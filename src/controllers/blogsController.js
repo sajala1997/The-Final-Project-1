@@ -95,7 +95,7 @@ const delBlogs = async function (req, res) {
         if (!blog) return res.status(404).send({ status: false, data: "ID not Found in path param" })
 
         const check = await blogsModel.findById(blog)
-        if(check.isDeleted=="true") return res.status(200).send({ status: false, msg: "data is already deleted" }) 
+        if(check.isDeleted==true) return res.status(200).send({ status: false, msg: "data is already deleted" }) 
         if (!check) return res.status(404).send({ status: false, msg: "data not found with this blog id" })
         console.log(check)
         let token = req.headers["x-api-key"];

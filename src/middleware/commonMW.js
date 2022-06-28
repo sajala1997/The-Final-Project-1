@@ -12,13 +12,7 @@ const authenticate = async function (req, res, next) {
         if (!token) return res.status(400).send({ status: false, msg: "Token Required" });
         let decodedToken = jwt.verify(token, "ProjectBlog")   
         if (!decodedToken) return res.status(403).send({ status: false, msg: "Not Authorised" });
-        // let author = req.params.authorId;
-        // console.log(author);
-        // let authorSignedUp = decodedToken.authorId;
-        // console.log(authorSignedUp);
-        // if (author !== authorSignedUp) return res.status(403).send({ status: false, msg: "Validation Failed" });
-
-        // req.authorId = decodedToken.authorId
+        
         next()
     }
     catch (err) {
